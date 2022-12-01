@@ -1,0 +1,61 @@
+cabal-version: 2.4
+
+name:        array-exceptions
+category:    Data
+version:     1.0.0
+synopsis:    TODO
+description: TODO
+
+author:       jacob leach
+maintainer:   jacobleach@protonmail.com
+copyright:    2022, Jacob Leach
+homepage:     https://github.com/riz0id/array-exceptions
+license:      ISC
+license-file: LICENSE
+build-type:   Simple
+
+extra-source-files:
+  CHANGELOG.md
+  README.md
+
+tested-with:
+  GHC == 9.2.4
+
+common common
+  default-language: Haskell2010
+
+  default-extensions:
+    DeriveDataTypeable DeriveGeneric DeriveLift ImportQualifiedPost
+
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Wcpp-undef
+    -Widentities
+    -Wmissing-export-lists
+
+    -ddump-to-file
+    -ddump-stg-final
+    -ddump-simpl
+    -dppr-cols=120
+    -dsuppress-module-prefixes
+    -dsuppress-uniques
+
+  build-depends:
+    , base >= 4.15.1 && < 4.17
+
+library
+  import:         common
+  hs-source-dirs: src
+
+  ghc-options:
+    -j
+    -O2
+    -fmax-simplifier-iterations=20
+
+  build-depends:
+    -- , ghc-prim         >= 0.7.0  && < 0.9
+    , template-haskell >= 2.17.0 && < 2.19
+
+  exposed-modules:
+    Control.Exception.Array
