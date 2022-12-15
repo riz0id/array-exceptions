@@ -1,6 +1,6 @@
 cabal-version: 2.4
 
-name:        array-exceptions
+name:        example
 category:    Data
 version:     1.0.0
 synopsis:    TODO
@@ -9,7 +9,7 @@ description: TODO
 author:       jacob leach
 maintainer:   jacobleach@protonmail.com
 copyright:    2022, Jacob Leach
-homepage:     https://github.com/riz0id/array-exceptions
+homepage:     https://github.com/riz0id/example
 license:      ISC
 license-file: LICENSE
 build-type:   Simple
@@ -32,7 +32,6 @@ common common
     -Wcompat
     -Wcpp-undef
     -Widentities
-    -Wmissing-export-lists
 
     -ddump-to-file
     -ddump-stg-final
@@ -44,9 +43,9 @@ common common
   build-depends:
     , base >= 4.15.1 && < 4.17
 
-library
+executable example
   import:         common
-  hs-source-dirs: src
+  main-is:        Main.hs
 
   ghc-options:
     -j
@@ -54,8 +53,7 @@ library
     -fmax-simplifier-iterations=20
 
   build-depends:
+    , array-exceptions >= 1.0.0  && < 1.1
+    , primitive
     -- , ghc-prim         >= 0.7.0  && < 0.9
     , template-haskell >= 2.17.0 && < 2.19
-
-  exposed-modules:
-    Control.Exception.RangeError

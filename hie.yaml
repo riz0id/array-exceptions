@@ -1,4 +1,14 @@
 cradle:
-  cabal:
-    - path: "./src"
-      component: "lib:array-exceptions"
+  multi:
+    - path: "./."
+      config:
+        cradle:
+          cabal:
+            - path: "./src"
+              component: "lib:array-exceptions"
+    - path: "./example"
+      config:
+        cradle:
+          cabal:
+            - path: "./example"
+              component: "exe:example"

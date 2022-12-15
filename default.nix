@@ -5,6 +5,12 @@ let
     inherit ghc;
   };
 in {
+  inherit (pkgs) 
+    mkShell;
+
   inherit (pkgs.haskell.packages."${ghc}") 
-    array-exceptions; 
+    array-exceptions
+    example
+    hlint
+    haskell-language-server;
 }
