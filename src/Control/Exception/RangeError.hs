@@ -16,15 +16,24 @@ module Control.Exception.RangeError (
   -- * RangeError
   RangeError (..),
 
+  -- ** Query
+  isEmptyRangeError,
+
   -- * RangePrefix
   RangePrefix (..),
+
+  -- ** Show
+  showRangePrefix,
+  describeRangePrefix,
 ) where
 
 import Data.Data (Data)
 
 import GHC.Generics (Generic)
 
+import Language.Haskell.TH qualified as TH
 import Language.Haskell.TH.Syntax (Lift (..), Name, liftData, unsafeCodeCoerce)
+import Control.Exception (Exception)
 
 -- RangeError ------------------------------------------------------------------
 
@@ -33,17 +42,22 @@ import Language.Haskell.TH.Syntax (Lift (..), Name, liftData, unsafeCodeCoerce)
 -- @since 1.0.0
 data RangeError = RangeError
   { -- | TODO: docs
-    functionName :: Name
+    name :: Name
     -- | TODO: docs
   , typeName     :: Name
     -- | TODO: docs
-  , indexPrefix  :: Maybe RangePrefix
+  , prefix  :: Maybe RangePrefix
+    -- | TODO: docs
+  , index :: Int
     -- | TODO: docs
   , lowerBound   :: Int
     -- | TODO: docs
   , upperBound   :: Int
   }
-  deriving (Data, Eq, Generic, Ord, Show)
+  deriving (Data, Eq, Generic, Ord)
+
+-- | @since 1.0.0
+instance Exception RangeError
 
 -- | @since 1.0.0
 instance Lift RangeError where
@@ -53,14 +67,77 @@ instance Lift RangeError where
   liftTyped exn = unsafeCodeCoerce (lift exn)
   {-# INLINE liftTyped #-}
 
+-- | @since 1.0.0
+instance Show RangeError where
+  showsPrec _ exn
+    | isEmptyRangeError exn =
+      descName
+        . showString ": "
+        . descIndex 
+        . showString " is out of range for empty "
+        . descType
+        . showString "\n  "
+        . noteIndex 
+    | otherwise =
+      descName
+        . showString ": "
+        . descIndex 
+        . showString " is out of range for "
+        . descType
+        . showString "\n  "
+        . noteIndex 
+        . showString "\n  valid range: ["
+        . shows (lowerBound exn)
+        . showString ", "
+        . shows (upperBound exn)
+        . showString "]"
+    where 
+      descName :: ShowS 
+      descName = showString (TH.nameBase (name exn))
+
+      descType :: ShowS 
+      descType = showString (TH.nameBase (typeName exn))
+
+      descIndex :: ShowS
+      descIndex = maybe (showString "index") showRangePrefix (prefix exn)
+
+      noteIndex :: ShowS 
+      noteIndex = case prefix exn of 
+        Nothing -> showString "index: " . shows (index exn)
+        Just x  -> describeRangePrefix x (index exn)
+  {-# INLINE showsPrec #-}
+
+-- RangeError - Query ----------------------------------------------------------
+
+-- | TODO: docs
+--
+-- @since 1.0.0
+isEmptyRangeError :: RangeError -> Bool
+isEmptyRangeError exn = upperBound exn < lowerBound exn
+
 -- RangePrefix -----------------------------------------------------------------
 
--- TODO: docs
+-- | TODO: docs
 --
 -- @since 1.0.0
 data RangePrefix
-  = -- | TODO: docs 
-    PrefixStarting
-    -- | TODO: docs
+  -- | TODO: docs
+  = PrefixStarting
+  -- | TODO: docs
   | PrefixEnding
-  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Lift, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Lift, Ord, Show)
+
+-- RangePrefix - Show ----------------------------------------------------------
+
+-- | TODO: docs
+--
+-- @since 1.0.0
+showRangePrefix :: RangePrefix -> ShowS
+showRangePrefix PrefixStarting = showString "starting index"
+showRangePrefix PrefixEnding   = showString "ending index"
+
+-- | TODO: docs
+--
+-- @since 1.0.0
+describeRangePrefix :: RangePrefix -> Int -> ShowS
+describeRangePrefix x i = showRangePrefix x . showString ": " . shows i
