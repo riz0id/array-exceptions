@@ -27,13 +27,14 @@ module Control.Exception.RangeError (
   describeRangePrefix,
 ) where
 
+import Control.Exception (Exception)
+
 import Data.Data (Data)
 
 import GHC.Generics (Generic)
 
 import Language.Haskell.TH qualified as TH
 import Language.Haskell.TH.Syntax (Lift (..), Name, liftData, unsafeCodeCoerce)
-import Control.Exception (Exception)
 
 -- RangeError ------------------------------------------------------------------
 
@@ -42,17 +43,17 @@ import Control.Exception (Exception)
 -- @since 1.0.0
 data RangeError = RangeError
   { -- | TODO: docs
-    name :: Name
+    name       :: Name
     -- | TODO: docs
-  , typeName     :: Name
+  , typeName   :: Name
     -- | TODO: docs
-  , prefix  :: Maybe RangePrefix
+  , prefix     :: Maybe RangePrefix
     -- | TODO: docs
-  , index :: Int
+  , index      :: {-# UNPACK #-} !Int
     -- | TODO: docs
-  , lowerBound   :: Int
+  , lowerBound :: {-# UNPACK #-} !Int
     -- | TODO: docs
-  , upperBound   :: Int
+  , upperBound :: {-# UNPACK #-} !Int
   }
   deriving (Data, Eq, Generic, Ord)
 
@@ -73,36 +74,36 @@ instance Show RangeError where
     | isEmptyRangeError exn =
       descName
         . showString ": "
-        . descIndex 
+        . descIndex
         . showString " is out of range for empty "
         . descType
         . showString "\n  "
-        . noteIndex 
+        . noteIndex
     | otherwise =
       descName
         . showString ": "
-        . descIndex 
+        . descIndex
         . showString " is out of range for "
         . descType
         . showString "\n  "
-        . noteIndex 
+        . noteIndex
         . showString "\n  valid range: ["
         . shows (lowerBound exn)
         . showString ", "
         . shows (upperBound exn)
         . showString "]"
-    where 
-      descName :: ShowS 
+    where
+      descName :: ShowS
       descName = showString (TH.nameBase (name exn))
 
-      descType :: ShowS 
+      descType :: ShowS
       descType = showString (TH.nameBase (typeName exn))
 
       descIndex :: ShowS
       descIndex = maybe (showString "index") showRangePrefix (prefix exn)
 
-      noteIndex :: ShowS 
-      noteIndex = case prefix exn of 
+      noteIndex :: ShowS
+      noteIndex = case prefix exn of
         Nothing -> showString "index: " . shows (index exn)
         Just x  -> describeRangePrefix x (index exn)
   {-# INLINE showsPrec #-}
