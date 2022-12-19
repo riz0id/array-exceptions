@@ -2,9 +2,9 @@
 
 module Main where
 
-import Control.Exception.RangeError
+import Control.Exception.RangeError (RangeError (..))
 
-import Data.Primitive.SmallArray
+import Data.Primitive.SmallArray (SmallArray, indexSmallArray, sizeofSmallArray)
 
 import GHC.Exts (fromList)
 
@@ -28,6 +28,6 @@ main :: IO ()
 main = do
   let array = fromList [1 .. 5] :: SmallArray Int
 
-  case lookupSmallArray array 5 of 
+  case lookupSmallArray array 5 of
     Left exn -> print exn
     Right x  -> print x
