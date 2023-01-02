@@ -1,12 +1,11 @@
-{ ghc ? "ghc924" }:
+{ ghc ? "ghc942" }:
 
 let 
   pkgs = import ./default.nix { 
     inherit ghc; 
   };
 in pkgs.mkShell {
-  buildInputs = (with pkgs; [
-    hlint
-    haskell-language-server
-  ]);
+  buildInputs = [
+    (pkgs.haskell.packages."${ghc}".haskell-language-server)
+  ];
 }

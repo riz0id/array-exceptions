@@ -12,20 +12,18 @@
 -- TODO: docs
 --
 -- @since 1.0.0
-module Control.Exception.RangeError (
-  -- * RangeError
-  RangeError (..),
-
-  -- ** Query
-  isEmptyRangeError,
-
-  -- * RangePrefix
-  RangePrefix (..),
-
-  -- ** Show
-  showRangePrefix,
-  describeRangePrefix,
-) where
+module Control.Exception.RangeError
+  ( -- * RangeError
+    RangeError (..)
+    -- ** Construction
+    -- ** Query
+  , isEmptyRangeError
+    -- * RangePrefix
+  , RangePrefix (..)
+    -- ** Show
+  , showRangePrefix
+  , describeRangePrefix
+  ) where
 
 import Control.Exception (Exception)
 
