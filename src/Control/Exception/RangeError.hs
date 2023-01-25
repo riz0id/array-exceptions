@@ -15,10 +15,7 @@
 -- @since 1.0.0
 module Control.Exception.RangeError
   ( -- * Range Errors
-    RangeError (..)
-    -- ** Construction
-  , pattern StartingRangeError
-  , pattern EndingRangeError
+    RangeError (StartingRangeError, EndingRangeError, ..)
     -- ** Query
   , isEmptyRangeError
     -- * Range Prefixes
@@ -34,8 +31,8 @@ import Data.Data (Data)
 
 import GHC.Generics (Generic)
 
-import Language.Haskell.TH qualified as TH
-import Language.Haskell.TH.Syntax (Lift (..), Name, liftData, unsafeCodeCoerce)
+import Language.Haskell.TH.Syntax (Lift (..), Name)
+import Language.Haskell.TH.Syntax qualified as TH
 
 -- Range Errors ----------------------------------------------------------------
 
@@ -86,10 +83,10 @@ instance Exception RangeError where
 
 -- | @since 1.0.0
 instance Lift RangeError where
-  lift = liftData
+  lift = TH.liftData
   {-# INLINE lift #-}
 
-  liftTyped exn = unsafeCodeCoerce (lift exn)
+  liftTyped exn = TH.unsafeCodeCoerce (lift exn)
   {-# INLINE liftTyped #-}
 
 -- | @since 1.0.0
@@ -139,14 +136,16 @@ instance Show RangeError where
 --
 -- @since 1.0.0
 pattern StartingRangeError :: Name -> Name -> Int -> Int -> Int -> RangeError
-pattern StartingRangeError fun ty pos lower upper = RangeError fun ty (Just PrefixStarting) pos lower upper
+pattern StartingRangeError fun ty pos lower upper = 
+  RangeError fun ty (Just PrefixStarting) pos lower upper
 
 -- | 'EndingRangeError' is a pattern synonym for constructing a 'RangeError' 
 -- using @('Just' 'PrefixEnding')@ as the value for 'prefix' field.
 --
 -- @since 1.0.0
 pattern EndingRangeError :: Name -> Name -> Int -> Int -> Int -> RangeError
-pattern EndingRangeError fun ty pos lower upper = RangeError fun ty (Just PrefixEnding) pos lower upper
+pattern EndingRangeError fun ty pos lower upper = 
+  RangeError fun ty (Just PrefixEnding) pos lower upper
 
 {-# COMPLETE StartingRangeError, EndingRangeError #-}
 
